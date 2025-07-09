@@ -44,6 +44,9 @@ import (
 
 	"github.com/cubefs/cubefs/sdk/meta"
 
+	"github.com/jacobsa/daemonize"
+	_ "go.uber.org/automaxprocs"
+
 	"github.com/cubefs/cubefs/client/blockcache/bcache"
 	cfs "github.com/cubefs/cubefs/client/fs"
 	"github.com/cubefs/cubefs/depends/bazil.org/fuse"
@@ -60,8 +63,6 @@ import (
 	"github.com/cubefs/cubefs/util/stat"
 	sysutil "github.com/cubefs/cubefs/util/sys"
 	"github.com/cubefs/cubefs/util/ump"
-	"github.com/jacobsa/daemonize"
-	_ "go.uber.org/automaxprocs"
 )
 
 const (
@@ -858,8 +859,12 @@ func mount(opt *proto.MountOptions) (fsConn *fuse.Conn, super *cfs.Super, err er
 		options = append(options, fuse.DefaultPermissions())
 	}
 
-	if opt.EnableUnixPermission {
+	if opt.EnableUnixPermission || opt.AllowIdMap {
 		options = append(options, fuse.DefaultPermissions())
+	}
+
+	if opt.AllowIdMap {
+		options = append(options, fuse.AllowIdMap())
 	}
 
 	fsConn, err = fuse.Mount(opt.MountPoint, opt.NeedRestoreFuse, options...)
@@ -969,6 +974,8 @@ func parseMountOption(cfg *config.Config) (*proto.MountOptions, error) {
 	opt.FileSystemName = GlobalMountOptions[proto.FileSystemName].GetString()
 	opt.DisableMountSubtype = GlobalMountOptions[proto.DisableMountSubtype].GetBool()
 	opt.StreamRetryTimeout = int(GlobalMountOptions[proto.StreamRetryTimeOut].GetInt64())
+
+	opt.AllowIdMap = true
 
 	opt.AheadReadEnable = GlobalMountOptions[proto.AheadReadEnable].GetBool()
 	if opt.AheadReadEnable {

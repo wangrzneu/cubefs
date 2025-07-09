@@ -41,7 +41,7 @@
 //
 // The hellofs subdirectory contains a simple illustration of the fs.Serve approach.
 //
-// Service Methods
+// # Service Methods
 //
 // The required and optional methods for the FS, Node, and Handle interfaces
 // have the general form
@@ -60,7 +60,7 @@
 // including any []byte fields such as WriteRequest.Data or
 // SetxattrRequest.Xattr.
 //
-// Errors
+// # Errors
 //
 // Operations can return errors. The FUSE interface can only
 // communicate POSIX errno error numbers to file system clients, the
@@ -71,7 +71,7 @@
 // Error messages will be visible in the debug log as part of the
 // response.
 //
-// Interrupted Operations
+// # Interrupted Operations
 //
 // In some file systems, some operations
 // may take an undetermined amount of time.  For example, a Read waiting for
@@ -84,7 +84,7 @@
 // If an operation does not block for an indefinite amount of time, supporting
 // cancellation is not necessary.
 //
-// Authentication
+// # Authentication
 //
 // All requests types embed a Header, meaning that the method can
 // inspect req.Pid, req.Uid, and req.Gid as necessary to implement
@@ -93,11 +93,10 @@
 // AllowOther, AllowRoot), but does not enforce access modes (to
 // change this, see DefaultPermissions).
 //
-// Mount Options
+// # Mount Options
 //
 // Behavior and metadata of the mounted file system can be changed by
 // passing MountOption values to Mount.
-//
 package fuse // import "github.com/cubefs/cubefs/depends/bazil.org/fuse"
 
 import (
@@ -977,7 +976,7 @@ loop:
 			Header:       m.Header(),
 			Kernel:       Protocol{in.Major, in.Minor},
 			MaxReadahead: in.MaxReadahead,
-			Flags:        InitFlags(in.Flags),
+			Flags:        InitFlags(uint64(in.Flags) | uint64(in.Flags2)<<32),
 		}
 
 	case opGetlk:
@@ -1258,6 +1257,7 @@ func (r *InitRequest) Respond(resp *InitResponse) {
 	out.Minor = resp.Library.Minor
 	out.MaxReadahead = resp.MaxReadahead
 	out.Flags = uint32(resp.Flags)
+	out.Flags2 = uint32(resp.Flags >> 32)
 	out.MaxWrite = resp.MaxWrite
 
 	// MaxWrite larger than our receive buffer would just lead to
@@ -2130,7 +2130,7 @@ func (r *FlushRequest) Respond() {
 type RemoveRequest struct {
 	Header `json:"-"`
 	Name   string // name of the entry to remove
-	Dir    bool   // is this rmdir?
+	Dir    bool // is this rmdir?
 }
 
 var _ = Request(&RemoveRequest{})

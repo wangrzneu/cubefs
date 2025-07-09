@@ -82,11 +82,11 @@ const (
 )
 
 var getattrFlagsNames = []flagName{
-	{uint32(GetattrFh), "GetattrFh"},
+	{uint64(GetattrFh), "GetattrFh"},
 }
 
 func (fl GetattrFlags) String() string {
-	return flagString(uint32(fl), getattrFlagsNames)
+	return flagString(uint64(fl), getattrFlagsNames)
 }
 
 // The SetattrValid are bit flags describing which fields in the SetattrRequest
@@ -130,24 +130,24 @@ func (fl SetattrValid) Bkuptime() bool  { return fl&SetattrBkuptime != 0 }
 func (fl SetattrValid) Flags() bool     { return fl&SetattrFlags != 0 }
 
 func (fl SetattrValid) String() string {
-	return flagString(uint32(fl), setattrValidNames)
+	return flagString(uint64(fl), setattrValidNames)
 }
 
 var setattrValidNames = []flagName{
-	{uint32(SetattrMode), "SetattrMode"},
-	{uint32(SetattrUid), "SetattrUid"},
-	{uint32(SetattrGid), "SetattrGid"},
-	{uint32(SetattrSize), "SetattrSize"},
-	{uint32(SetattrAtime), "SetattrAtime"},
-	{uint32(SetattrMtime), "SetattrMtime"},
-	{uint32(SetattrHandle), "SetattrHandle"},
-	{uint32(SetattrAtimeNow), "SetattrAtimeNow"},
-	{uint32(SetattrMtimeNow), "SetattrMtimeNow"},
-	{uint32(SetattrLockOwner), "SetattrLockOwner"},
-	{uint32(SetattrCrtime), "SetattrCrtime"},
-	{uint32(SetattrChgtime), "SetattrChgtime"},
-	{uint32(SetattrBkuptime), "SetattrBkuptime"},
-	{uint32(SetattrFlags), "SetattrFlags"},
+	{uint64(SetattrMode), "SetattrMode"},
+	{uint64(SetattrUid), "SetattrUid"},
+	{uint64(SetattrGid), "SetattrGid"},
+	{uint64(SetattrSize), "SetattrSize"},
+	{uint64(SetattrAtime), "SetattrAtime"},
+	{uint64(SetattrMtime), "SetattrMtime"},
+	{uint64(SetattrHandle), "SetattrHandle"},
+	{uint64(SetattrAtimeNow), "SetattrAtimeNow"},
+	{uint64(SetattrMtimeNow), "SetattrMtimeNow"},
+	{uint64(SetattrLockOwner), "SetattrLockOwner"},
+	{uint64(SetattrCrtime), "SetattrCrtime"},
+	{uint64(SetattrChgtime), "SetattrChgtime"},
+	{uint64(SetattrBkuptime), "SetattrBkuptime"},
+	{uint64(SetattrFlags), "SetattrFlags"},
 }
 
 // Flags that can be seen in OpenRequest.Flags.
@@ -183,7 +183,7 @@ func (fl OpenFlags) String() string {
 	s := accModeName(fl & OpenAccessModeMask)
 	flags := uint32(fl &^ OpenAccessModeMask)
 	if flags != 0 {
-		s = s + "+" + flagString(flags, openFlagNames)
+		s = s + "+" + flagString(uint64(flags), openFlagNames)
 	}
 	return s
 }
@@ -217,13 +217,13 @@ func accModeName(flags OpenFlags) string {
 }
 
 var openFlagNames = []flagName{
-	{uint32(OpenAppend), "OpenAppend"},
-	{uint32(OpenCreate), "OpenCreate"},
-	{uint32(OpenDirectory), "OpenDirectory"},
-	{uint32(OpenExclusive), "OpenExclusive"},
-	{uint32(OpenNonblock), "OpenNonblock"},
-	{uint32(OpenSync), "OpenSync"},
-	{uint32(OpenTruncate), "OpenTruncate"},
+	{uint64(OpenAppend), "OpenAppend"},
+	{uint64(OpenCreate), "OpenCreate"},
+	{uint64(OpenDirectory), "OpenDirectory"},
+	{uint64(OpenExclusive), "OpenExclusive"},
+	{uint64(OpenNonblock), "OpenNonblock"},
+	{uint64(OpenSync), "OpenSync"},
+	{uint64(OpenTruncate), "OpenTruncate"},
 }
 
 // The OpenResponseFlags are returned in the OpenResponse.
@@ -239,19 +239,19 @@ const (
 )
 
 func (fl OpenResponseFlags) String() string {
-	return flagString(uint32(fl), openResponseFlagNames)
+	return flagString(uint64(fl), openResponseFlagNames)
 }
 
 var openResponseFlagNames = []flagName{
-	{uint32(OpenDirectIO), "OpenDirectIO"},
-	{uint32(OpenKeepCache), "OpenKeepCache"},
-	{uint32(OpenNonSeekable), "OpenNonSeekable"},
-	{uint32(OpenPurgeAttr), "OpenPurgeAttr"},
-	{uint32(OpenPurgeUBC), "OpenPurgeUBC"},
+	{uint64(OpenDirectIO), "OpenDirectIO"},
+	{uint64(OpenKeepCache), "OpenKeepCache"},
+	{uint64(OpenNonSeekable), "OpenNonSeekable"},
+	{uint64(OpenPurgeAttr), "OpenPurgeAttr"},
+	{uint64(OpenPurgeUBC), "OpenPurgeUBC"},
 }
 
 // The InitFlags are used in the Init exchange.
-type InitFlags uint32
+type InitFlags uint64
 
 const (
 	InitAsyncRead     InitFlags = 1 << 0
@@ -279,44 +279,50 @@ const (
 	InitCaseSensitive InitFlags = 1 << 29 // OS X only
 	InitVolRename     InitFlags = 1 << 30 // OS X only
 	InitXtimes        InitFlags = 1 << 31 // OS X only
+
+	/* bits 32..63 get shifted down 32 bits into the Flags2 field */
+
+	InitAllowIdmap InitFlags = (1 << 40)
 )
 
 type flagName struct {
-	bit  uint32
+	bit  uint64
 	name string
 }
 
 var initFlagNames = []flagName{
-	{uint32(InitAsyncRead), "InitAsyncRead"},
-	{uint32(InitPosixLocks), "InitPosixLocks"},
-	{uint32(InitFileOps), "InitFileOps"},
-	{uint32(InitAtomicTrunc), "InitAtomicTrunc"},
-	{uint32(InitExportSupport), "InitExportSupport"},
-	{uint32(InitBigWrites), "InitBigWrites"},
-	{uint32(InitDontMask), "InitDontMask"},
-	{uint32(InitSpliceWrite), "InitSpliceWrite"},
-	{uint32(InitSpliceMove), "InitSpliceMove"},
-	{uint32(InitSpliceRead), "InitSpliceRead"},
-	{uint32(InitFlockLocks), "InitFlockLocks"},
-	{uint32(InitHasIoctlDir), "InitHasIoctlDir"},
-	{uint32(InitAutoInvalData), "InitAutoInvalData"},
-	{uint32(InitDoReaddirplus), "InitDoReaddirplus"},
-	{uint32(InitReaddirplusAuto), "InitReaddirplusAuto"},
-	{uint32(InitAsyncDIO), "InitAsyncDIO"},
-	{uint32(InitWritebackCache), "InitWritebackCache"},
-	{uint32(InitNoOpenSupport), "InitNoOpenSupport"},
-	{uint32(InitPOSIXACL), "InitPOSIXACL"},
+	{uint64(InitAsyncRead), "InitAsyncRead"},
+	{uint64(InitPosixLocks), "InitPosixLocks"},
+	{uint64(InitFileOps), "InitFileOps"},
+	{uint64(InitAtomicTrunc), "InitAtomicTrunc"},
+	{uint64(InitExportSupport), "InitExportSupport"},
+	{uint64(InitBigWrites), "InitBigWrites"},
+	{uint64(InitDontMask), "InitDontMask"},
+	{uint64(InitSpliceWrite), "InitSpliceWrite"},
+	{uint64(InitSpliceMove), "InitSpliceMove"},
+	{uint64(InitSpliceRead), "InitSpliceRead"},
+	{uint64(InitFlockLocks), "InitFlockLocks"},
+	{uint64(InitHasIoctlDir), "InitHasIoctlDir"},
+	{uint64(InitAutoInvalData), "InitAutoInvalData"},
+	{uint64(InitDoReaddirplus), "InitDoReaddirplus"},
+	{uint64(InitReaddirplusAuto), "InitReaddirplusAuto"},
+	{uint64(InitAsyncDIO), "InitAsyncDIO"},
+	{uint64(InitWritebackCache), "InitWritebackCache"},
+	{uint64(InitNoOpenSupport), "InitNoOpenSupport"},
+	{uint64(InitPOSIXACL), "InitPOSIXACL"},
 
-	{uint32(InitCaseSensitive), "InitCaseSensitive"},
-	{uint32(InitVolRename), "InitVolRename"},
-	{uint32(InitXtimes), "InitXtimes"},
+	{uint64(InitCaseSensitive), "InitCaseSensitive"},
+	{uint64(InitVolRename), "InitVolRename"},
+	{uint64(InitXtimes), "InitXtimes"},
+
+	{uint64(InitAllowIdmap), "InitAllowIdmap"},
 }
 
 func (fl InitFlags) String() string {
-	return flagString(uint32(fl), initFlagNames)
+	return flagString(uint64(fl), initFlagNames)
 }
 
-func flagString(f uint32, names []flagName) string {
+func flagString(f uint64, names []flagName) string {
 	var s string
 
 	if f == 0 {
@@ -343,11 +349,11 @@ const (
 )
 
 func (fl ReleaseFlags) String() string {
-	return flagString(uint32(fl), releaseFlagNames)
+	return flagString(uint64(fl), releaseFlagNames)
 }
 
 var releaseFlagNames = []flagName{
-	{uint32(ReleaseFlush), "ReleaseFlush"},
+	{uint64(ReleaseFlush), "ReleaseFlush"},
 }
 
 // Opcodes
@@ -587,11 +593,11 @@ const (
 )
 
 var readFlagNames = []flagName{
-	{uint32(ReadLockOwner), "ReadLockOwner"},
+	{uint64(ReadLockOwner), "ReadLockOwner"},
 }
 
 func (fl ReadFlags) String() string {
-	return flagString(uint32(fl), readFlagNames)
+	return flagString(uint64(fl), readFlagNames)
 }
 
 type writeIn struct {
@@ -628,12 +634,12 @@ const (
 )
 
 var writeFlagNames = []flagName{
-	{uint32(WriteCache), "WriteCache"},
-	{uint32(WriteLockOwner), "WriteLockOwner"},
+	{uint64(WriteCache), "WriteCache"},
+	{uint64(WriteLockOwner), "WriteLockOwner"},
 }
 
 func (fl WriteFlags) String() string {
-	return flagString(uint32(fl), writeFlagNames)
+	return flagString(uint64(fl), writeFlagNames)
 }
 
 const compatStatfsSize = 48
@@ -702,17 +708,26 @@ type initIn struct {
 	Minor        uint32
 	MaxReadahead uint32
 	Flags        uint32
+	Flags2       uint32
+	Unused       [11]uint32
 }
 
 const initInSize = int(unsafe.Sizeof(initIn{}))
 
 type initOut struct {
-	Major        uint32
-	Minor        uint32
-	MaxReadahead uint32
-	Flags        uint32
-	Unused       uint32
-	MaxWrite     uint32
+	Major               uint32
+	Minor               uint32
+	MaxReadahead        uint32
+	Flags               uint32
+	MaxBackground       uint16
+	CongestionThreshold uint16
+	MaxWrite            uint32
+	TimeGran            uint32
+	MaxPages            uint16
+	Padding             uint16
+	Flags2              uint32
+	MaxStackDepth       uint32
+	Unused              [6]uint32
 }
 
 type interruptIn struct {

@@ -90,8 +90,8 @@ func VolumeName(name string) MountOption {
 //
 // Such file names are:
 //
-//     ._*
-//     .DS_Store
+//	._*
+//	.DS_Store
 //
 // OS X only.  Others ignore this option.
 func NoAppleDouble() MountOption {
@@ -254,6 +254,13 @@ func AutoInvalData(enable int64) MountOption {
 		}
 	}
 	return func(conf *mountConfig) error {
+		return nil
+	}
+}
+
+func AllowIdMap() MountOption {
+	return func(conf *mountConfig) error {
+		conf.initFlags |= InitAllowIdmap
 		return nil
 	}
 }

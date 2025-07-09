@@ -365,4 +365,6 @@ type MountOptions struct {
 	AheadReadTotalMem     int64
 	AheadReadBlockTimeOut int
 	AheadReadWindowCnt    int
+
+	AllowIdMap bool
 }
