@@ -864,9 +864,11 @@ func mount(opt *proto.MountOptions) (fsConn *fuse.Conn, super *cfs.Super, err er
 	}
 
 	if opt.AllowIdMap {
+		log.LogInfof("AllowIdMap enabled, uid/gid will be mapped to the user namespace")
 		options = append(options, fuse.AllowIdMap())
 	}
 
+	log.LogInfof("Mount options: %v+, opt: %+v", options, opt)
 	fsConn, err = fuse.Mount(opt.MountPoint, opt.NeedRestoreFuse, options...)
 	return
 }
