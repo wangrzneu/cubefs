@@ -105,6 +105,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"sync"
 	"syscall"
@@ -218,6 +219,7 @@ var (
 )
 
 func initMount(c *Conn, conf *mountConfig) error {
+	log.Printf("fuse: init mount with options: %v", conf.options)
 	req, err := c.ReadRequest()
 	if err != nil {
 		if err == io.EOF {
@@ -225,11 +227,12 @@ func initMount(c *Conn, conf *mountConfig) error {
 		}
 		return err
 	}
+	log.Printf("fuse: raw request: %s", req)
 	r, ok := req.(*InitRequest)
 	if !ok {
 		return fmt.Errorf("missing init, got: %T", req)
 	}
-
+	log.Printf("fuse: init request: %s", r)
 	min := Protocol{protoVersionMinMajor, protoVersionMinMinor}
 	if r.Kernel.LT(min) {
 		req.RespondError(Errno(syscall.EPROTO))
@@ -1243,6 +1246,13 @@ type InitResponse struct {
 	// Maximum size of a single write operation.
 	// Linux enforces a minimum of 4 KiB.
 	MaxWrite uint32
+	// Time granularity in nanoseconds.
+	TimeGran      uint32
+	MaxPages      uint16
+	Padding       uint16
+	Flags2        uint32
+	MaxStackDepth uint32
+	Unused        [6]uint32
 }
 
 func (r *InitResponse) String() string {
