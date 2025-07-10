@@ -227,12 +227,10 @@ func initMount(c *Conn, conf *mountConfig) error {
 		}
 		return err
 	}
-	log.Printf("fuse: raw request: %s", req)
 	r, ok := req.(*InitRequest)
 	if !ok {
 		return fmt.Errorf("missing init, got: %T", req)
 	}
-	log.Printf("fuse: init request: %s", r)
 	min := Protocol{protoVersionMinMajor, protoVersionMinMinor}
 	if r.Kernel.LT(min) {
 		req.RespondError(Errno(syscall.EPROTO))
@@ -256,7 +254,6 @@ func initMount(c *Conn, conf *mountConfig) error {
 		MaxWrite:     maxWrite,
 		Flags:        InitBigWrites | conf.initFlags,
 	}
-	log.Printf("fuse: init response: %v", s)
 	r.Respond(s)
 	return nil
 }
@@ -1271,7 +1268,6 @@ func (r *InitRequest) Respond(resp *InitResponse) {
 	if out.MaxWrite > maxWrite {
 		out.MaxWrite = maxWrite
 	}
-	log.Printf("fuse: Init response %v", out)
 	r.respond(buf)
 }
 
@@ -2137,7 +2133,7 @@ func (r *FlushRequest) Respond() {
 type RemoveRequest struct {
 	Header `json:"-"`
 	Name   string // name of the entry to remove
-	Dir    bool // is this rmdir?
+	Dir    bool   // is this rmdir?
 }
 
 var _ = Request(&RemoveRequest{})

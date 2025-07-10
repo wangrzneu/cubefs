@@ -934,7 +934,6 @@ func (s *Server) Serve(fs FS, opt *proto.MountOptions) error {
 			}
 			return err
 		}
-		log.Printf("fuse: read request: %v", req)
 
 		switch req.(type) {
 		case *fuse.ForgetRequest:
@@ -1530,7 +1529,6 @@ func (c *Server) serveWithTimeOut(r fuse.Request, requestTimeout int64) {
 
 // handleRequest will either a) call done(s) and r.Respond(s) OR b) return an error.
 func (c *Server) handleRequest(ctx context.Context, node Node, snode *serveNode, r fuse.Request, done func(resp interface{})) error {
-	log.Printf("fuse: handling request %v", r.String())
 	switch r := r.(type) {
 	default:
 		// Note: To FUSE, ENOSYS means "this server never implements this request."
