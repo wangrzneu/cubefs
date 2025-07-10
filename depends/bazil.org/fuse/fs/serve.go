@@ -928,11 +928,13 @@ func (s *Server) Serve(fs FS, opt *proto.MountOptions) error {
 
 		req, err := s.conn.ReadRequest()
 		if err != nil {
+			log.Printf("fuse: failed to read request: %v", err)
 			if err == io.EOF {
 				break
 			}
 			return err
 		}
+		log.Printf("fuse: read request: %v", req)
 
 		switch req.(type) {
 		case *fuse.ForgetRequest:
