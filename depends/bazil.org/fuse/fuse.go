@@ -1253,6 +1253,8 @@ func (r *InitResponse) String() string {
 	return fmt.Sprintf("Init %v ra=%d fl=%v w=%d", r.Library, r.MaxReadahead, r.Flags, r.MaxWrite)
 }
 
+const CAPInitExt = (1 << 30)
+
 // Respond replies to the request with the given response.
 func (r *InitRequest) Respond(resp *InitResponse) {
 	buf := newBuffer(unsafe.Sizeof(initOut{}))
@@ -1260,7 +1262,7 @@ func (r *InitRequest) Respond(resp *InitResponse) {
 	out.Major = resp.Library.Major
 	out.Minor = resp.Library.Minor
 	out.MaxReadahead = resp.MaxReadahead
-	out.Flags = uint32(resp.Flags)
+	out.Flags = uint32(resp.Flags) | CAPInitExt
 	out.Flags2 = uint32(resp.Flags >> 32)
 	out.MaxWrite = resp.MaxWrite
 
