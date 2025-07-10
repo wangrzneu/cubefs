@@ -256,6 +256,7 @@ func initMount(c *Conn, conf *mountConfig) error {
 		MaxWrite:     maxWrite,
 		Flags:        InitBigWrites | conf.initFlags,
 	}
+	log.Printf("fuse: init response: %v", s)
 	r.Respond(s)
 	return nil
 }
@@ -1246,13 +1247,6 @@ type InitResponse struct {
 	// Maximum size of a single write operation.
 	// Linux enforces a minimum of 4 KiB.
 	MaxWrite uint32
-	// Time granularity in nanoseconds.
-	TimeGran      uint32
-	MaxPages      uint16
-	Padding       uint16
-	Flags2        uint32
-	MaxStackDepth uint32
-	Unused        [6]uint32
 }
 
 func (r *InitResponse) String() string {
@@ -1275,6 +1269,7 @@ func (r *InitRequest) Respond(resp *InitResponse) {
 	if out.MaxWrite > maxWrite {
 		out.MaxWrite = maxWrite
 	}
+	log.Printf("fuse: Init response %v", out)
 	r.respond(buf)
 }
 
