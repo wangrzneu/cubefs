@@ -3,6 +3,7 @@
 package fs // import "github.com/cubefs/cubefs/depends/bazil.org/fuse/fs"
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"hash/fnv"
@@ -19,14 +20,13 @@ import (
 
 	"github.com/cubefs/cubefs/proto"
 
-	"bytes"
+	"golang.org/x/net/context"
+	"golang.org/x/time/rate"
 
 	"github.com/cubefs/cubefs/depends/bazil.org/fuse"
 	"github.com/cubefs/cubefs/depends/bazil.org/fuse/fuseutil"
 	"github.com/cubefs/cubefs/util"
 	"github.com/cubefs/cubefs/util/stat"
-	"golang.org/x/net/context"
-	"golang.org/x/time/rate"
 )
 
 const (
@@ -1528,6 +1528,7 @@ func (c *Server) serveWithTimeOut(r fuse.Request, requestTimeout int64) {
 
 // handleRequest will either a) call done(s) and r.Respond(s) OR b) return an error.
 func (c *Server) handleRequest(ctx context.Context, node Node, snode *serveNode, r fuse.Request, done func(resp interface{})) error {
+	log.Printf("fuse: handling request %v", r.String())
 	switch r := r.(type) {
 	default:
 		// Note: To FUSE, ENOSYS means "this server never implements this request."
