@@ -17,6 +17,8 @@ type mountConfig struct {
 	initFlags        InitFlags
 	osxfuseLocations []OSXFUSEPaths
 	RequestTimeout   int64
+	maxBackground    uint16
+	maxPages         uint16
 }
 
 func escapeComma(s string) string {
@@ -341,6 +343,22 @@ func PosixACL() MountOption {
 func RequestTimeout(timeout int64) MountOption {
 	return func(conf *mountConfig) error {
 		conf.RequestTimeout = timeout
+		return nil
+	}
+}
+
+// MaxBackground sets the maximum number of background requests
+func MaxBackground(maxBackground uint16) MountOption {
+	return func(conf *mountConfig) error {
+		conf.maxBackground = maxBackground
+		return nil
+	}
+}
+
+// MaxPages sets the maximum number of pages
+func MaxPages(maxPages uint16) MountOption {
+	return func(conf *mountConfig) error {
+		conf.maxPages = maxPages
 		return nil
 	}
 }

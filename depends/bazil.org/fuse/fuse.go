@@ -249,10 +249,12 @@ func initMount(c *Conn, conf *mountConfig) error {
 	c.proto = proto
 
 	s := &InitResponse{
-		Library:      proto,
-		MaxReadahead: conf.maxReadahead,
-		MaxWrite:     maxWrite,
-		Flags:        InitBigWrites | conf.initFlags,
+		Library:       proto,
+		MaxReadahead:  conf.maxReadahead,
+		MaxWrite:      maxWrite,
+		Flags:         InitBigWrites | conf.initFlags,
+		MaxBackground: conf.maxBackground,
+		MaxPages:      conf.maxPages,
 	}
 	r.Respond(s)
 	return nil
@@ -1243,7 +1245,9 @@ type InitResponse struct {
 	Flags        InitFlags
 	// Maximum size of a single write operation.
 	// Linux enforces a minimum of 4 KiB.
-	MaxWrite uint32
+	MaxWrite      uint32
+	MaxBackground uint16
+	MaxPages      uint16
 }
 
 func (r *InitResponse) String() string {
@@ -1262,7 +1266,8 @@ func (r *InitRequest) Respond(resp *InitResponse) {
 	out.Flags = uint32(resp.Flags) | CAPInitExt
 	out.Flags2 = uint32(resp.Flags >> 32)
 	out.MaxWrite = resp.MaxWrite
-
+	out.MaxBackground = resp.MaxBackground
+	out.MaxPages = resp.MaxPages
 	// MaxWrite larger than our receive buffer would just lead to
 	// errors on large writes.
 	if out.MaxWrite > maxWrite {

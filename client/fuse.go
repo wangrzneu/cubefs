@@ -82,6 +82,10 @@ const (
 	UpdateConfInterval = 2 * time.Minute
 
 	MasterRetrys = 5
+
+	MaxBackground = 32
+
+	MaxPages = 256
 )
 
 const (
@@ -840,6 +844,8 @@ func mount(opt *proto.MountOptions) (fsConn *fuse.Conn, super *cfs.Super, err er
 		fuse.LocalVolume(),
 		fuse.VolumeName(opt.FileSystemName),
 		fuse.RequestTimeout(opt.RequestTimeout),
+		fuse.MaxBackground(MaxBackground),
+		fuse.MaxPages(MaxPages),
 	}
 
 	if !opt.DisableMountSubtype {
